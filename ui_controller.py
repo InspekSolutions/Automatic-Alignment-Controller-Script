@@ -19,8 +19,7 @@ from PyQt5.QtGui import QImage, QPixmap, QPainter, QPen, QColor, QFont
 from detection import find_edge_lines, angle_between_lines, find_chip_channels, find_fa_channels
 
 # Use the real SurugaController from alignment_functions.
-# Create a shared controller instance.
-controller = alignment_functions.SurugaController()
+# Controller is created when user clicks Connect in the UI (see MainWindow).
 
 def standardize_config(config, controller=None):
     """
@@ -867,23 +866,22 @@ class MainWindow(QMainWindow):
         # Load the UI file
         uic.loadUi('main_window.ui', self)
         
-        # Create canvas instances with larger size
-        self.canvas = MplCanvas(width=8, height=6)
-        self.heatmap_canvas = HeatmapCanvas(width=8, height=6)
-        
-        # Add canvases to their respective layout containers
+        # Create canvas instances with larger size (motor tab is archived; canvas only if layout exists)
         if hasattr(self, 'visualization_layout'):
+            self.canvas = MplCanvas(width=8, height=6)
             self.visualization_layout.addWidget(self.canvas)
         else:
-            self.log_message("Warning: visualization_layout not found in UI")
+            self.canvas = None  # Motor movement tab archived
+        self.heatmap_canvas = HeatmapCanvas(width=8, height=6)
             
         if hasattr(self, 'heatmap_layout'):
             self.heatmap_layout.addWidget(self.heatmap_canvas)
         else:
             self.log_message("Warning: heatmap_layout not found in UI")
-        
-        # Use the real controller instance
-        self.controller = controller
+
+        # Controller connection: start with no controller; user connects via UI
+        self.controller = None
+        self._setup_connection_ui()
 
         # Initialize data storage
         self.measurement_data = None  # Will be initialized in start_alignment
@@ -988,6 +986,63 @@ class MainWindow(QMainWindow):
             self.log_display.verticalScrollBar().maximum()
         )
 
+    def _setup_connection_ui(self):
+        """Wire connection group: suggest IP from config, connect button creates controller."""
+        suggested = alignment_functions.get_suggested_ams_net_id()
+        if suggested:
+            self.ams_net_id_input.setText(suggested)
+        self.suggest_ip_button.clicked.connect(self._suggest_ip)
+        self.connect_button.clicked.connect(self._try_connect)
+        self.set_connection_state(False)
+
+    def _suggest_ip(self):
+        """Fill AMS Net ID from last saved config (suggested address)."""
+        suggested = alignment_functions.get_suggested_ams_net_id()
+        if suggested:
+            self.ams_net_id_input.setText(suggested)
+            self.log_message("Suggested AMS Net ID loaded from config.")
+        else:
+            self.log_message("No saved address in config. Enter AMS Net ID manually.")
+
+    def _try_connect(self):
+        """Create SurugaController with current AMS Net ID; enable UI on success."""
+        ip = (self.ams_net_id_input.text() or "").strip()
+        if not ip:
+            QMessageBox.warning(self, "Connection", "Please enter an AMS Net ID (e.g. 5.146.68.196.1.1).")
+            return
+        self.connect_button.setEnabled(False)
+        self.log_message(f"Connecting to {ip}...")
+        try:
+            self.controller = alignment_functions.SurugaController(ip)
+            alignment_functions.save_ams_net_id(ip)
+            self.connection_status_label.setText("Connected")
+            self.set_connection_state(True)
+            self.log_message("Controller connected successfully.")
+        except Exception as e:
+            self.controller = None
+            self.connection_status_label.setText("Not connected")
+            self.set_connection_state(False)
+            self.log_message(f"Connection failed: {e}")
+            QMessageBox.critical(self, "Connection failed", str(e))
+        finally:
+            self.connect_button.setEnabled(True)
+
+    def set_connection_state(self, connected):
+        """Enable or disable controls that require the controller."""
+        for w in (
+            self.run_button, self.stop_button, self.move_to_max_button,
+            self.manual_move_button, self.save_position_button, self.go_to_saved_button,
+            self.grab_coordinates_button, self.run_routine_button,
+            self.add_step_button, self.remove_step_button, self.move_up_button, self.move_down_button,
+        ):
+            w.setEnabled(connected)
+        if hasattr(self, "control_group"):
+            self.control_group.setEnabled(connected)
+        if hasattr(self, "manual_group"):
+            self.manual_group.setEnabled(connected)
+        if hasattr(self, "custom_routine_group"):
+            self.custom_routine_group.setEnabled(connected)
+
     def load_presets(self):
         try:
             if os.path.exists(self.presets_file):
@@ -1066,6 +1121,9 @@ class MainWindow(QMainWindow):
         if not self.current_routine:
             QMessageBox.warning(self, "Warning", "No steps in the current routine to run")
             return
+        if not self.controller:
+            self.log_message("Please connect to the controller first (AMS Net ID → Connect).")
+            return
 
         self.run_routine_button.setEnabled(False)
         self.stop_button.setEnabled(True)
@@ -1107,6 +1165,9 @@ class MainWindow(QMainWindow):
 
 
     def start_alignment(self):
+        if not self.controller:
+            self.log_message("Please connect to the controller first (AMS Net ID → Connect).")
+            return
         translation_speed = self.speed_input.value()
         rotation_speed = self.rotation_speed_input.value()
         search_range = self.translation_range_input.value()
@@ -1146,10 +1207,12 @@ class MainWindow(QMainWindow):
         self.last_scan_result = None
         self.move_to_max_button.setEnabled(False)
         
-        # Reset visualizations
-        self.position_evolution_group.show()
-        self.canvas.clear_plots()
-        
+        # Reset visualizations (motor tab may be archived)
+        if hasattr(self, 'position_evolution_group'):
+            self.position_evolution_group.show()
+        if self.canvas:
+            self.canvas.clear_plots()
+
         # Set heatmap mode and axis ranges
         if mode == "Scan Tz,Y":
             self.heatmap_canvas.set_mode("Scan Tz,Y")
@@ -1355,9 +1418,10 @@ class MainWindow(QMainWindow):
             self.last_scan_result = result
             self.move_to_max_button.setEnabled(True)
             
-            # Update UI state
+            # Update UI state (motor tab may be archived)
             current_data = self.measurement_data[:self.data_index]
-            self.canvas.update_plots(current_data[['x', 'y']]) #, 'rz']])
+            if self.canvas:
+                self.canvas.update_plots(current_data[['x', 'y']]) #, 'rz']])
             self.ui_timer.stop()
             self.run_button.setEnabled(True)
             self.stop_button.setEnabled(False)
@@ -1511,8 +1575,9 @@ class MainWindow(QMainWindow):
             self.last_scan_result = None
             self.current_routine.clear()
             
-            # Reset visualizations
-            self.canvas.clear_plots()
+            # Reset visualizations (motor tab may be archived)
+            if self.canvas:
+                self.canvas.clear_plots()
             self.heatmap_canvas.update_heatmap([])
             
             # Reset UI elements

@@ -1,7 +1,7 @@
 # IO Map for alignment_functions.py
 
-SurugaController.__init__(ip_address="5.146.68.196.1.1")
-    Input: ip_address (str, default="5.146.68.196.1.1")
+SurugaController.__init__(ip_address)
+    Input: ip_address (str, required) — AMS Net ID, e.g. from UI connection field or get_suggested_ams_net_id()
     Output: SurugaController instance (connects to hardware)
 
 SurugaController.move_relative(axis_number, distance)

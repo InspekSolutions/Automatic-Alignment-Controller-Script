@@ -29,7 +29,7 @@ import numpy as np
 
 # Import functions from detection.py
 from detection import find_edge_lines, angle_between_lines, find_chip_channels, find_fa_channels
-from alignment_functions import SurugaController
+from alignment_functions import SurugaController, get_suggested_ams_net_id
 
 
 class FrameHandler(QObject):
@@ -142,8 +142,9 @@ class VimbaViewer(QMainWindow):
         self.trajectory = None
         self.trajectory_color = QColor(255, 165, 0)  # Orange by default
         self.suruga_controller = None
+        ip = get_suggested_ams_net_id() or "5.146.68.196.1.1"
         try:
-            self.suruga_controller = SurugaController()
+            self.suruga_controller = SurugaController(ip)
             print("SurugaController initialized.")
         except Exception as e:
             print(f"Failed to initialize SurugaController: {e}")

@@ -100,6 +100,13 @@ QScrollBar::handle:vertical:hover {
 }
 QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
     height: 0px;
+}
+QLineEdit {
+    background-color: #112240;
+    color: #E0E0E0;
+    border: 1px solid #00BFFF;
+    border-radius: 3px;
+    padding: 3px;
 }</string>
   </property>
   <widget class="QWidget" name="centralwidget">
@@ -118,6 +125,54 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
       <property name="leftMargin">
        <number>0</number>
       </property>
+      <item>
+       <widget class="QGroupBox" name="connection_group">
+        <property name="title">
+         <string>Controller connection</string>
+        </property>
+        <layout class="QFormLayout" name="connection_form">
+         <item row="0" column="0">
+          <widget class="QLabel" name="ams_net_id_label">
+           <property name="text">
+            <string>AMS Net ID:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QLineEdit" name="ams_net_id_input">
+           <property name="placeholderText">
+            <string>e.g. 5.146.68.196.1.1</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0" colspan="2">
+          <layout class="QHBoxLayout" name="connection_buttons_layout">
+           <item>
+            <widget class="QPushButton" name="suggest_ip_button">
+             <property name="text">
+              <string>Suggest</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="connect_button">
+             <property name="text">
+              <string>Connect</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="2" column="0" colspan="2">
+          <widget class="QLabel" name="connection_status_label">
+           <property name="text">
+            <string>Not connected</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
       <item>
        <widget class="QTabWidget" name="tabWidget_2">
         <property name="sizePolicy">
@@ -1092,47 +1147,6 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
                </property>
                <property name="autoFillBackground">
                 <bool>false</bool>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-        <widget class="QWidget" name="motor_tab">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <attribute name="title">
-          <string>Motor movement</string>
-         </attribute>
-         <layout class="QVBoxLayout" name="verticalLayout">
-          <item>
-           <widget class="QGroupBox" name="position_evolution_group">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="autoFillBackground">
-             <bool>false</bool>
-            </property>
-            <layout class="QVBoxLayout" name="visualization_layout">
-             <property name="sizeConstraint">
-              <enum>QLayout::SetDefaultConstraint</enum>
-             </property>
-             <item>
-              <widget class="QWidget" name="canvas" native="true">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
                </property>
               </widget>
              </item>

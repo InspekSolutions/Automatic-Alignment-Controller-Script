@@ -14,6 +14,8 @@ A progress_callback parameter (optional) allows reporting every new best configu
 """
 
 import sys
+import os
+import json
 from os.path import expanduser
 import time
 import pythonnet
@@ -30,16 +32,52 @@ import math
 import numpy as np
 
 # ----------------------------------------
+# Connection config: suggested AMS Net ID (saved last-used address)
+# ----------------------------------------
+CONNECTION_CONFIG_FILE = "connection_config.json"
+
+
+def get_suggested_ams_net_id():
+    """
+    Return a suggested AMS Net ID for the Suruga controller:
+    - If connection_config.json exists, returns the last saved 'ams_net_id'.
+    - Otherwise returns a placeholder (user must enter or paste an address).
+    """
+    try:
+        config_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), CONNECTION_CONFIG_FILE)
+        if os.path.isfile(config_path):
+            with open(config_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                return data.get("ams_net_id", "") or ""
+    except Exception:
+        pass
+    return ""
+
+
+def save_ams_net_id(ams_net_id):
+    """Save the given AMS Net ID to connection_config.json for next-time suggestion."""
+    try:
+        config_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), CONNECTION_CONFIG_FILE)
+        with open(config_path, "w", encoding="utf-8") as f:
+            json.dump({"ams_net_id": ams_net_id}, f, indent=2)
+    except Exception:
+        pass
+
+
+# ----------------------------------------
 # SurugaController: wrapper around srgmc.dll
 # ----------------------------------------
 class SurugaController:
-    def __init__(self, ip_address="5.146.68.196.1.1"):
+    def __init__(self, ip_address):
         """
         Initialize and connect to the SurugaSeiki alignment system via srgmc.dll
-        using the specified AMS Net ID (ip_address).
+        using the specified AMS Net ID (ip_address). ip_address must be provided
+        (e.g. from the UI connection field or config).
         """
+        if not (ip_address and str(ip_address).strip()):
+            raise ValueError("AMS Net ID (ip_address) is required.")
         self.alignSystem = SSM.System.Instance
-        self.alignSystem.SetAddress(ip_address)
+        self.alignSystem.SetAddress(str(ip_address).strip())
         
         time.sleep(1)
         if not self.alignSystem.Connected:
