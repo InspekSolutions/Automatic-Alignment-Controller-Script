@@ -1,0 +1,206 @@
+# IO Map for alignment_functions.py
+
+SurugaController.__init__(ip_address="5.146.68.196.1.1")
+    Input: ip_address (str, default="5.146.68.196.1.1")
+    Output: SurugaController instance (connects to hardware)
+
+SurugaController.move_relative(axis_number, distance)
+    Input: axis_number (int), distance (float)
+    Output: None
+
+spiral(controller, axis_x=7, axis_y=8, search_range_x=100, search_range_y=100, field_pitch_x=1, field_pitch_y=1, speed_x=100, speed_y=100, progress_callback=None)
+    Input: controller (SurugaController), axis_x (int), axis_y (int), search_range_x (float), search_range_y (float), field_pitch_x (float), field_pitch_y (float), speed_x (float), speed_y (float), progress_callback (callable or None)
+    Output: (best_config, best_signal, data_list)
+        best_config: tuple (x, y)
+        best_signal: float
+        data_list: np.ndarray of shape (n, 4) with [x, y, signal1, signal2]
+
+scan2D(controller, axis_x=7, axis_y=8, search_range_x=100, search_range_y=100, field_pitch_x=1, field_pitch_y=1, speed_x=1000, speed_y=1000, alpha=0, progress_callback=None)
+    Input: controller (SurugaController), axis_x (int), axis_y (int), search_range_x (float), search_range_y (float), field_pitch_x (float), field_pitch_y (float), speed_x (float), speed_y (float), alpha (float), progress_callback (callable or None)
+    Output: (best_config, best_signal, data_list)
+        best_config: dict {x, y}
+        best_signal: float
+        data_list: np.ndarray of shape (n, 4) with [x, y, signal1, signal2]
+
+scanTz_Y(controller, axis_tz=12, axis_y=8, rotation_range_tz=1, search_range_y=10, rotation_step_tz=0.02, translation_step_y=0.2, speed_tz=0.01, speed_y=1000, alpha=0, progress_callback=None)
+    Input: controller (SurugaController), axis_tz (int), axis_y (int), rotation_range_tz (float), search_range_y (float), rotation_step_tz (float), translation_step_y (float), speed_tz (float), speed_y (float), alpha (float), progress_callback (callable or None)
+    Output: (best_config, best_signal, data_list) or None
+        best_config: dict {tz, y}
+        best_signal: float
+        data_list: np.ndarray of shape (n, 4) with [tz, y, signal1, signal2]
+
+scanTx_Y(controller, axis_tx=10, axis_y=8, rotation_range_tx=1, search_range_y=10, rotation_step_tx=0.02, translation_step_y=0.2, speed_tx=0.01, speed_y=1000, alpha=0, progress_callback=None)
+    Input: controller (SurugaController), axis_tx (int), axis_y (int), rotation_range_tx (float), search_range_y (float), rotation_step_tx (float), translation_step_y (float), speed_tx (float), speed_y (float), alpha (float), progress_callback (callable or None)
+    Output: (best_config, best_signal, data_list) or None
+        best_config: dict {tx, y}
+        best_signal: float
+        data_list: np.ndarray of shape (n, 4) with [tx, y, signal1, signal2]
+
+hill_climb_2channel(controller, axis_x=7, axis_y=8, step_size=0.1, search_range=20, speed=1000, alpha=0, max_iterations=100, progress_callback=None, steps_per_direction=3)
+    Input: controller (SurugaController), axis_x (int), axis_y (int), step_size (float), search_range (float), speed (float), alpha (float), max_iterations (int), progress_callback (callable or None), steps_per_direction (int)
+    Output: (best_config, best_signal, data_list)
+        best_config: dict {x, y}
+        best_signal: float
+        data_list: np.ndarray of shape (n, 4) with [x, y, signal1, signal2]
+
+align_angle_axis(controller, axis_component, search_range, step, signal_channel=1, progress_callback=None)
+    Input: controller (SurugaController), axis_component (int), search_range (float), step (float), signal_channel (int), progress_callback (callable or None)
+    Output: (optimal_angle, (best_signal1, best_signal2), data_list)
+        optimal_angle: float
+        best_signal1: float
+        best_signal2: float
+        data_list: np.ndarray of shape (n, 3) with [angle, signal1, signal2]
+
+align_Tz2(controller, search_range, step, signal_channel=1, progress_callback=None)
+    Input: controller (SurugaController), search_range (float), step (float), signal_channel (int), progress_callback (callable or None)
+    Output: (optimal_angle, (best_signal1, best_signal2), data_list)
+
+align_Tx2(controller, search_range, step, signal_channel=1, progress_callback=None)
+    Input: controller (SurugaController), search_range (float), step (float), signal_channel (int), progress_callback (callable or None)
+    Output: (optimal_angle, (best_signal1, best_signal2), data_list)
+
+move_axis(controller, axis_number, distance, speed=0.05)
+    Input: controller (SurugaController), axis_number (int), distance (float), speed (float, default=0.05)
+    Output: actual_position (float)
+
+# IO Map for ui_controller.py
+
+standardize_config(config, controller=None)
+    Input: config (tuple or dict), controller (optional, SurugaController)
+    Output: dict with keys 'x', 'y', 'rz'
+
+StepDialog.get_step_data()
+    Input: self
+    Output: dict with step parameters (varies by step type)
+
+CustomRoutineWorker.__init__(controller, steps)
+    Input: controller (SurugaController), steps (list)
+    Output: CustomRoutineWorker instance
+
+CustomRoutineWorker.stop()
+    Input: self
+    Output: None
+
+CustomRoutineWorker.check_interrupt()
+    Input: self
+    Output: bool (True to continue, False to interrupt)
+
+CustomRoutineWorker.run()
+    Input: self
+    Output: None (runs routine steps, emits progress)
+
+AlignmentWorker.__init__(controller, mode, translation_speed, rotation_speed, search_range, translation_step, rotation_range, rotation_step, alpha)
+    Input: controller (SurugaController), mode (str), translation_speed (float), rotation_speed (float), search_range (float), translation_step (float), rotation_range (float), rotation_step (float), alpha (float)
+    Output: AlignmentWorker instance
+
+AlignmentWorker.stop()
+    Input: self
+    Output: None
+
+AlignmentWorker.check_interrupt()
+    Input: self
+    Output: bool (True to continue, False to interrupt)
+
+AlignmentWorker.run()
+    Input: self
+    Output: None (runs alignment, emits signals)
+
+MplCanvas.__init__(parent=None, width=6, height=4, dpi=100)
+    Input: parent (optional), width (float), height (float), dpi (int)
+    Output: MplCanvas instance
+
+MplCanvas.clear_plots()
+    Input: self
+    Output: None
+
+MplCanvas.update_plots(history)
+    Input: history (np.ndarray or dict)
+    Output: None (updates plots)
+
+HeatmapCanvas.__init__(parent=None, width=6, height=4, dpi=100)
+    Input: parent (optional), width (float), height (float), dpi (int)
+    Output: HeatmapCanvas instance
+
+HeatmapCanvas.set_mode(mode)
+    Input: mode (str)
+    Output: None (updates axis labels)
+
+HeatmapCanvas.on_click(event)
+    Input: event (matplotlib event)
+    Output: None (handles click)
+
+HeatmapCanvas.update_click_marker()
+    Input: self
+    Output: None (updates marker)
+
+HeatmapCanvas.reset()
+    Input: self
+    Output: None (resets heatmap)
+
+HeatmapCanvas.set_range_params(x_min, x_max, y_min, y_max, step_x, step_y)
+    Input: x_min, x_max, y_min, y_max, step_x, step_y (float)
+    Output: None (sets visualization range)
+
+HeatmapCanvas.update_heatmap(heatmap_data)
+    Input: heatmap_data (array-like)
+    Output: None (updates heatmap)
+
+MainWindow.__init__()
+    Input: self
+    Output: MainWindow instance (sets up UI and connects signals)
+
+MainWindow.log_message(message)
+    Input: message (str)
+    Output: None (logs message)
+
+MainWindow.load_presets()
+    Input: self
+    Output: None (loads presets from file)
+
+MainWindow.save_presets()
+    Input: self
+    Output: None (saves presets to file)
+
+MainWindow.save_preset()
+    Input: self
+    Output: None (saves current routine as preset)
+
+MainWindow.load_preset(name)
+    Input: name (str)
+    Output: None (loads preset by name)
+
+MainWindow.add_step()
+    Input: self
+    Output: None (adds step to routine)
+
+MainWindow.remove_step()
+    Input: self
+    Output: None (removes selected step)
+
+MainWindow.move_step_up()
+    Input: self
+    Output: None (moves step up)
+
+MainWindow.move_step_down()
+    Input: self
+    Output: None (moves step down)
+
+MainWindow.update_routine_list()
+    Input: self
+    Output: None (updates routine list display)
+
+MainWindow.run_custom_routine()
+    Input: self
+    Output: None (starts custom routine)
+
+MainWindow.routine_complete()
+    Input: self
+    Output: None (routine finished)
+
+MainWindow.routine_error(message)
+    Input: message (str)
+    Output: None (handles routine error)
+
+MainWindow.on_mode_changed(mode)
+    Input: mode (str)
+    Output: None (updates UI for mode) 

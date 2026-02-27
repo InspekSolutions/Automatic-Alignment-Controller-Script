@@ -1,0 +1,105 @@
+{
+    "align_tz2_new": [
+        {
+            "type": "Scan2D",
+            "x": 0.0,
+            "y": 0.0,
+            "rz": 0.0,
+            "range": 10.0,
+            "step": 0.3,
+            "speed": 1000.0,
+            "rotation_range": 1.0,
+            "rotation_step": 0.01
+        },
+        {
+            "type": "Move to Max Signal",
+            "x": 0.0,
+            "y": 0.0,
+            "rz": 0.0,
+            "range": 100.0,
+            "step": 5.0,
+            "speed": 100.0,
+            "rotation_range": 1.0,
+            "rotation_step": 0.01
+        },
+        {
+            "type": "Align Tz2",
+            "x": 0.0,
+            "y": 0.0,
+            "rz": 0.0,
+            "range": 100.0,
+            "step": 5.0,
+            "speed": 100.0,
+            "rotation_range": 0.5,
+            "rotation_step": 0.01
+        },
+        {
+            "type": "Scan2D",
+            "x": 0.0,
+            "y": 0.0,
+            "rz": 0.0,
+            "range": 10.0,
+            "step": 0.3,
+            "speed": 1000.0,
+            "rotation_range": 1.0,
+            "rotation_step": 0.01
+        },
+        {
+            "type": "Move to Max Signal",
+            "x": 0.0,
+            "y": 0.0,
+            "rz": 0.0,
+            "range": 100.0,
+            "step": 5.0,
+            "speed": 100.0,
+            "rotation_range": 1.0,
+            "rotation_step": 0.01
+        },
+        {
+            "type": "Align Tz2",
+            "x": 0.0,
+            "y": 0.0,
+            "rz": 0.0,
+            "range": 100.0,
+            "step": 5.0,
+            "speed": 100.0,
+            "rotation_range": 0.5,
+            "rotation_step": 0.003
+        },
+        {
+            "type": "Scan2D",
+            "x": 0.0,
+            "y": 0.0,
+            "rz": 0.0,
+            "range": 5.0,
+            "step": 0.1,
+            "speed": 1000.0,
+            "rotation_range": 1.0,
+            "rotation_step": 0.01
+        },
+        {
+            "type": "Move to Max Signal",
+            "x": 0.0,
+            "y": 0.0,
+            "rz": 0.0,
+            "range": 100.0,
+            "step": 5.0,
+            "speed": 100.0,
+            "rotation_range": 1.0,
+            "rotation_step": 0.01
+        }
+    ],
+    "scan_tz": [
+        {
+            "type": "Align Tz2",
+            "x": 0.0,
+            "y": 0.0,
+            "rz": 0.0,
+            "range": 100.0,
+            "step": 5.0,
+            "speed": 1000.0,
+            "rotation_range": 0.15,
+            "rotation_step": 0.002
+        }
+    ]
+}

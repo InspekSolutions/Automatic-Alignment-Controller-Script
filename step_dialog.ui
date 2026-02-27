@@ -1,0 +1,384 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>StepDialog</class>
+ <widget class="QDialog" name="StepDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>402</width>
+    <height>407</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Add Step</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QDialog {
+    background-color: #0A192F;
+    color: #E0E0E0;
+}
+QLabel {
+    color: #E0E0E0;
+}
+QComboBox {
+    background-color: #112240;
+    color: #E0E0E0;
+    border: 1px solid #00BFFF;
+    border-radius: 3px;
+    padding: 3px;
+}
+QDoubleSpinBox {
+    background-color: #112240;
+    color: #E0E0E0;
+    border: 1px solid #00BFFF;
+    border-radius: 3px;
+    padding: 3px;
+}
+QPushButton {
+    background-color: #00BFFF;
+    color: #0A192F;
+    border: none;
+    border-radius: 3px;
+    padding: 5px 15px;
+    font-weight: bold;
+}
+QPushButton:hover {
+    background-color: #FF6F00;
+}
+QGroupBox {
+    background-color: #112240;
+    color: #E0E0E0;
+    border: 1px solid #00BFFF;
+    border-radius: 5px;
+    margin-top: 1em;
+    padding-top: 10px;
+}</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QFormLayout" name="formLayout">
+     <item row="0" column="0">
+      <widget class="QLabel" name="step_type_label">
+       <property name="text">
+        <string>Step Type:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QComboBox" name="step_type_combo">
+       <item>
+        <property name="text">
+         <string>Move to Position</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Scan Tz,Y</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Scan Tx,Y</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Move axis</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Scan2D</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Move to Max Signal</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Spiral Scan</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Align Tz2</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Align Tx2</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="x_label">
+       <property name="text">
+        <string>X Position:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QDoubleSpinBox" name="x_spin">
+       <property name="minimum">
+        <double>-50000.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>50000.000000000000000</double>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="y_label">
+       <property name="text">
+        <string>Y Position:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QDoubleSpinBox" name="y_spin">
+       <property name="minimum">
+        <double>-50000.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>50000.000000000000000</double>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="rz_label">
+       <property name="text">
+        <string>RZ Position:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QDoubleSpinBox" name="rz_spin">
+       <property name="minimum">
+        <double>-180.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>180.000000000000000</double>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="0">
+      <widget class="QLabel" name="range_label">
+       <property name="text">
+        <string>Search Range:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <widget class="QDoubleSpinBox" name="range_spin">
+       <property name="suffix">
+        <string> µm</string>
+       </property>
+       <property name="minimum">
+        <double>0.100000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>1000.000000000000000</double>
+       </property>
+       <property name="value">
+        <double>100.000000000000000</double>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="0">
+      <widget class="QLabel" name="step_label">
+       <property name="text">
+        <string>Step Size:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="1">
+      <widget class="QDoubleSpinBox" name="step_spin">
+       <property name="suffix">
+        <string> µm</string>
+       </property>
+       <property name="minimum">
+        <double>0.010000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>100.000000000000000</double>
+       </property>
+       <property name="value">
+        <double>5.000000000000000</double>
+       </property>
+      </widget>
+     </item>
+     <item row="7" column="0">
+      <widget class="QLabel" name="rotation_range_label">
+       <property name="text">
+        <string>Rotation Range:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="7" column="1">
+      <widget class="QDoubleSpinBox" name="rotation_range_spin">
+       <property name="suffix">
+        <string> deg</string>
+       </property>
+       <property name="decimals">
+        <number>2</number>
+       </property>
+       <property name="minimum">
+        <double>0.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>5.000000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>0.100000000000000</double>
+       </property>
+       <property name="value">
+        <double>1.000000000000000</double>
+       </property>
+      </widget>
+     </item>
+     <item row="8" column="0">
+      <widget class="QLabel" name="rotation_step_label">
+       <property name="text">
+        <string>Rotation Step:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="8" column="1">
+      <widget class="QDoubleSpinBox" name="rotation_step_spin">
+       <property name="suffix">
+        <string> deg</string>
+       </property>
+       <property name="decimals">
+        <number>3</number>
+       </property>
+       <property name="minimum">
+        <double>0.001000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>0.050000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>0.001000000000000</double>
+       </property>
+       <property name="value">
+        <double>0.010000000000000</double>
+       </property>
+      </widget>
+     </item>
+     <item row="10" column="0">
+      <widget class="QLabel" name="distance_label">
+       <property name="text">
+        <string>Distance:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="10" column="1">
+      <widget class="QDoubleSpinBox" name="distance_spin">
+       <property name="suffix">
+        <string> µm</string>
+       </property>
+      </widget>
+     </item>
+     <item row="9" column="0">
+      <widget class="QLabel" name="axis_label">
+       <property name="text">
+        <string>Axis:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="9" column="1">
+      <widget class="QComboBox" name="axis_combo">
+       <item>
+        <property name="text">
+         <string>X</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Y</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Z</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="6" column="0">
+      <widget class="QLabel" name="speed_label">
+       <property name="text">
+        <string>Speed:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="1">
+      <widget class="QDoubleSpinBox" name="speed_spin">
+       <property name="suffix">
+        <string> µm/s</string>
+       </property>
+       <property name="minimum">
+        <double>1.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>10000.000000000000000</double>
+       </property>
+       <property name="value">
+        <double>1000.000000000000000</double>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>StepDialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>248</x>
+     <y>254</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>157</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>StepDialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>316</x>
+     <y>260</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>286</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>
