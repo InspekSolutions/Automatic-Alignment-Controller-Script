@@ -986,35 +986,64 @@ class MainWindow(QMainWindow):
             self.log_display.verticalScrollBar().maximum()
         )
 
+    # Machine selection: label -> AMS Net ID
+    MACHINE_IPS = {
+        "Machine 1": "5.146.68.196.1.1",
+        "Machine 2": "5.158.88.246.1.1",
+    }
+
     def _setup_connection_ui(self):
-        """Wire connection group: suggest IP from config, connect button creates controller."""
-        suggested = alignment_functions.get_suggested_ams_net_id()
-        if suggested:
-            self.ams_net_id_input.setText(suggested)
+        """Wire connection group: set machine from config, connect button creates controller."""
+        suggested_machine = alignment_functions.get_suggested_machine()
+        if suggested_machine and suggested_machine in self.MACHINE_IPS:
+            idx = self.machine_combo.findText(suggested_machine)
+            if idx >= 0:
+                self.machine_combo.setCurrentIndex(idx)
+        else:
+            # Fallback: match by last saved IP
+            suggested_ip = alignment_functions.get_suggested_ams_net_id()
+            for label, addr in self.MACHINE_IPS.items():
+                if addr == suggested_ip:
+                    idx = self.machine_combo.findText(label)
+                    if idx >= 0:
+                        self.machine_combo.setCurrentIndex(idx)
+                    break
         self.suggest_ip_button.clicked.connect(self._suggest_ip)
         self.connect_button.clicked.connect(self._try_connect)
         self.set_connection_state(False)
 
     def _suggest_ip(self):
-        """Fill AMS Net ID from last saved config (suggested address)."""
-        suggested = alignment_functions.get_suggested_ams_net_id()
-        if suggested:
-            self.ams_net_id_input.setText(suggested)
-            self.log_message("Suggested AMS Net ID loaded from config.")
-        else:
-            self.log_message("No saved address in config. Enter AMS Net ID manually.")
+        """Set machine combo from last saved config."""
+        suggested_machine = alignment_functions.get_suggested_machine()
+        if suggested_machine and suggested_machine in self.MACHINE_IPS:
+            idx = self.machine_combo.findText(suggested_machine)
+            if idx >= 0:
+                self.machine_combo.setCurrentIndex(idx)
+                self.log_message("Suggested machine loaded from config.")
+                return
+        suggested_ip = alignment_functions.get_suggested_ams_net_id()
+        for label, addr in self.MACHINE_IPS.items():
+            if addr == suggested_ip:
+                idx = self.machine_combo.findText(label)
+                if idx >= 0:
+                    self.machine_combo.setCurrentIndex(idx)
+                self.log_message("Suggested machine loaded from config.")
+                return
+        self.log_message("No saved machine in config.")
 
     def _try_connect(self):
-        """Create SurugaController with current AMS Net ID; enable UI on success."""
-        ip = (self.ams_net_id_input.text() or "").strip()
+        """Create SurugaController for selected machine; enable UI on success."""
+        machine = self.machine_combo.currentText()
+        ip = self.MACHINE_IPS.get(machine)
         if not ip:
-            QMessageBox.warning(self, "Connection", "Please enter an AMS Net ID (e.g. 5.146.68.196.1.1).")
+            QMessageBox.warning(self, "Connection", "Please select a machine (Machine 1 or Machine 2).")
             return
         self.connect_button.setEnabled(False)
-        self.log_message(f"Connecting to {ip}...")
+        machine_id = 1 if machine == "Machine 1" else 2
+        self.log_message(f"Connecting to {machine} ({ip})...")
         try:
-            self.controller = alignment_functions.SurugaController(ip)
-            alignment_functions.save_ams_net_id(ip)
+            self.controller = alignment_functions.SurugaController(ip, machine=machine_id)
+            alignment_functions.save_ams_net_id(ip, machine=machine)
             self.connection_status_label.setText("Connected")
             self.set_connection_state(True)
             self.log_message("Controller connected successfully.")

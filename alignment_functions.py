@@ -54,12 +54,28 @@ def get_suggested_ams_net_id():
     return ""
 
 
-def save_ams_net_id(ams_net_id):
-    """Save the given AMS Net ID to connection_config.json for next-time suggestion."""
+def get_suggested_machine():
+    """Return the last saved machine label (e.g. 'Machine 1') from config, or empty string."""
     try:
         config_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), CONNECTION_CONFIG_FILE)
+        if os.path.isfile(config_path):
+            with open(config_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                return data.get("machine", "") or ""
+    except Exception:
+        pass
+    return ""
+
+
+def save_ams_net_id(ams_net_id, machine=None):
+    """Save the given AMS Net ID (and optional machine label) to connection_config.json."""
+    try:
+        config_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), CONNECTION_CONFIG_FILE)
+        payload = {"ams_net_id": ams_net_id}
+        if machine is not None:
+            payload["machine"] = machine
         with open(config_path, "w", encoding="utf-8") as f:
-            json.dump({"ams_net_id": ams_net_id}, f, indent=2)
+            json.dump(payload, f, indent=2)
     except Exception:
         pass
 
@@ -67,33 +83,49 @@ def save_ams_net_id(ams_net_id):
 # ----------------------------------------
 # SurugaController: wrapper around srgmc.dll
 # ----------------------------------------
+# Machine 1: physical axes 7-12. Machine 2: physical axes 1-6 (mapped to logical 7-12 in code).
+MACHINE_AXIS_RANGES = {
+    1: (7, 12),   # Machine 1: channels 7-12
+    2: (1, 6),    # Machine 2: channels 1-6
+}
+
+
 class SurugaController:
-    def __init__(self, ip_address):
+    def __init__(self, ip_address, machine=1):
         """
         Initialize and connect to the SurugaSeiki alignment system via srgmc.dll
-        using the specified AMS Net ID (ip_address). ip_address must be provided
-        (e.g. from the UI connection field or config).
+        using the specified AMS Net ID (ip_address).
+        machine: 1 = axes 7-12, 2 = axes 1-6 (exposed as logical 7-12 to callers).
         """
         if not (ip_address and str(ip_address).strip()):
             raise ValueError("AMS Net ID (ip_address) is required.")
+        self._machine = int(machine)
+        first, last = MACHINE_AXIS_RANGES.get(self._machine, (7, 12))
+
         self.alignSystem = SSM.System.Instance
         self.alignSystem.SetAddress(str(ip_address).strip())
-        
+
         time.sleep(1)
         if not self.alignSystem.Connected:
             raise RuntimeError("Failed to connect to Suruga alignment system.")
-        
-        # Create references to AxisComponents (example: 1..12)
-        self.AxisComponents = {}
-        for axisNumber in range(1, 13):
-            self.AxisComponents[axisNumber] = SSM.AxisComponents(axisNumber)
 
-        # Create an Alignment instance
+        # Create only the AxisComponents valid for this machine (avoids "out of range" error)
+        self.AxisComponents = {}
+        if self._machine == 1:
+            for axis_number in range(first, last + 1):
+                self.AxisComponents[axis_number] = SSM.AxisComponents(axis_number)
+            self.axis2d = SSM.Axis2D(7, 8)
+            self.axis2d_zx = SSM.Axis2D(9, 7)
+        else:
+            # Machine 2: physical 1-6, expose as logical 7-12 so existing code works
+            _logical_to_physical = {7: 1, 8: 2, 9: 3, 10: 4, 11: 5, 12: 6}
+            for logical, physical in _logical_to_physical.items():
+                self.AxisComponents[logical] = SSM.AxisComponents(physical)
+            self.axis2d = SSM.Axis2D(1, 2)       # physical X,Y
+            self.axis2d_zx = SSM.Axis2D(3, 1)   # physical Z,X
+
         self.Alignment = SSM.Alignment()
-        self.axis2d = SSM.Axis2D(7,8)
-        self.axis2d_zx = SSM.Axis2D(9,7)
         self.stop_requested = False
-        # Example usage: check servo states, etc.
         for axis in self.AxisComponents.values():
             if not axis.IsServoOn():
                 axis.TurnOnServo()
